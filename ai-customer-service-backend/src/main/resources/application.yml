@@ -1,0 +1,137 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/
+
+spring:
+  application:
+    name: ai-customer-service
+  config:
+    import:
+      - classpath:config.yml
+
+  # ==================== 数据源配置 ====================
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/ai_customer_service?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:your_password_here}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      keepalive-time: 30000
+      leak-detection-threshold: 60000
+
+  # ==================== JPA 配置 ====================
+  jpa:
+    hibernate:
+      ddl-auto: validate   # 生产环境使用 validate，首次运行可改为 create
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        default_batch_fetch_size: 20
+
+  # ==================== Redis 配置 ====================
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:114.215.173.147}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
+      database: 0
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 1
+          max-wait: 5000ms
+
+  # ==================== 文件上传配置 ====================
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+
+  # ==================== Spring AI Alibaba 配置 ====================
+  ai:
+    dashscope:
+      api-key: ${SPRING_AI_DASHSCOPE_API_KEY:your-dashscope-api-key-here}
+      # chat 模型由数据库动态加载，此处不做硬编码
+      embedding:
+        options:
+          model: text-embedding-v3
+
+    # Milvus 向量数据库配置
+    vectorstore:
+      milvus:
+        enabled: false
+        client:
+          host: ${SPRING_AI_VECTORSTORE_MILVUS_CLIENT_HOST:localhost}
+          port: ${SPRING_AI_VECTORSTORE_MILVUS_CLIENT_PORT:19530}
+          username: root
+          password: milvus
+        databaseName: default
+        collectionName: ai_knowledge_base
+        embeddingDimension: 1536
+        indexType: IVF_FLAT
+        metricType: COSINE
+        initializeSchema: true
+
+# ==================== MinIO 配置 ====================
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket:
+    knowledge: knowledge-base   # 知识库文件桶
+    avatar: user-avatars        # 用户头像桶
+  default-expiry: 3600          # 预签名 URL 过期时间（秒）
+
+# ==================== Sa-Token 配置 ====================
+sa-token:
+  token-name: Authorization
+  timeout: 2592000          # 登录态有效期 30 天（秒）
+  active-timeout: -1        # 不活跃超时（-1 表示不限制）
+  is-concurrent: true       # 允许同一账号并发登录
+  is-share: true
+  token-style: uuid
+  is-log: false
+  jwt-secret-key: ${SA_TOKEN_JWT_SECRET_KEY:your-jwt-secret-key-minimum-32-chars-here}
+
+# ==================== 应用自定义配置 ====================
+app:
+  # AI 记忆配置
+  memory:
+    redis-prefix: "admin:chat:memory:" # Redis Key 前缀
+    max-messages: 20                   # 单个 memoryId 最多保留消息条数
+    ttl-hours: 24                      # Redis TTL（小时）
+
+  # 知识库配置
+  knowledge:
+    chunk-size: 500                    # 文档分块大小（字符数）
+    chunk-overlap: 50                  # 分块重叠字符数
+    top-k: 5                           # RAG 检索 Top-K
+
+  # 跨域配置
+  cors:
+    allowed-origins:
+      - "http://localhost:5173"        # Vite 开发服务器
+      - "http://localhost:3000"
+      - "${APP_CORS_ALLOWED_ORIGINS:http://localhost}"
+    allowed-methods: "*"
+    allowed-headers: "*"
+    allow-credentials: true
+
+# ==================== 日志配置 ====================
+logging:
+  level:
+    com.huangyuanwei.aics: DEBUG
+    org.springframework.ai: INFO
+    io.minio: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"

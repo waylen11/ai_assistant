@@ -1,0 +1,25 @@
+# 开发环境配置（包含敏感信息，不提交）
+.env.development
+.env.local
+
+# 依赖
+node_modules/
+
+# 构建输出
+dist/
+
+# 本地调试日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db

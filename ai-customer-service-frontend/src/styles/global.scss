@@ -1,0 +1,223 @@
+@use './variables' as *;
+
+// ===== 重置 & 全局 =====
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: $font-family;
+  color: $text-primary;
+  background: $gradient-bg;
+  overflow: hidden;
+}
+
+// ===== 滚动条美化 =====
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+  }
+}
+
+// ===== 毛玻璃卡片基础样式 =====
+.glass-card {
+  background: $bg-glass;
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  border: $glass-border;
+  border-radius: $radius-lg;
+  box-shadow: $glass-shadow;
+}
+
+.glass-card-hover {
+  @extend .glass-card;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background: $bg-glass-hover;
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+    transform: translateY(-2px);
+  }
+}
+
+// ===== 动态星空背景 =====
+.star-bg {
+  position: fixed;
+  inset: 0;
+  background: $gradient-bg;
+  z-index: -1;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+    animation: nebula-shift 20s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes nebula-shift {
+  0% { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.05) translate(-1%, -1%); }
+}
+
+// ===== 打字机动画 =====
+.typing-cursor::after {
+  content: '|';
+  animation: blink 0.75s step-end infinite;
+  color: $primary-light;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+// ===== 渐入动画 =====
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// ===== 主按钮 =====
+.btn-primary {
+  background: $gradient-primary;
+  border: none;
+  color: white;
+  border-radius: $radius-md;
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// ===== Element Plus 主题覆盖 =====
+:root {
+  --el-color-primary: #{$primary};
+  --el-color-primary-light-3: #{$primary-light};
+  --el-color-primary-dark-2: #{$primary-dark};
+  --el-bg-color: transparent;
+  --el-bg-color-overlay: #{$bg-dark};
+  --el-border-color: rgba(255, 255, 255, 0.1);
+  --el-text-color-primary: #{$text-primary};
+  --el-text-color-regular: #{$text-secondary};
+  --el-fill-color-blank: rgba(255, 255, 255, 0.05);
+}
+
+// 输入框
+.el-input__wrapper {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
+  border-radius: $radius-md !important;
+  
+  &:hover, &.is-focus {
+    border-color: $primary !important;
+    background: rgba(255, 255, 255, 0.09) !important;
+  }
+}
+
+.el-input__inner {
+  color: $text-primary !important;
+  font-family: $font-family;
+}
+
+// 对话框
+.el-dialog {
+  background: $bg-dark !important;
+  border: $glass-border !important;
+  border-radius: $radius-xl !important;
+  backdrop-filter: blur(40px);
+}
+
+.el-dialog__title {
+  color: $text-primary !important;
+}
+
+// 表格
+.el-table {
+  background: transparent !important;
+  
+  &::before { display: none; }
+  
+  .el-table__header-wrapper {
+    th { 
+      background: rgba(255, 255, 255, 0.04) !important;
+      color: $text-secondary !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+  
+  .el-table__row {
+    background: transparent !important;
+    
+    td { 
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      color: $text-primary !important;
+    }
+    
+    &:hover td {
+      background: rgba(255, 255, 255, 0.04) !important;
+    }
+  }
+}
+
+// 下拉菜单
+.el-select__popper, .el-dropdown__popper {
+  background: $bg-dark !important;
+  border: $glass-border !important;
+  border-radius: $radius-md !important;
+  backdrop-filter: blur(20px);
+}
+
+.el-select-dropdown__item {
+  color: $text-primary !important;
+  
+  &.is-hovering, &:hover {
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: $primary-light !important;
+  }
+  
+  &.is-selected {
+    color: $primary-light !important;
+    background: rgba(99, 102, 241, 0.1) !important;
+  }
+}
+
+// 响应式
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+}

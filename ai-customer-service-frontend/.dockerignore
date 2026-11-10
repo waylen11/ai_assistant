@@ -1,0 +1,7 @@
+# 前端 .dockerignore
+node_modules/
+dist/
+*.log
+.git/
+.gitignore
+README.md

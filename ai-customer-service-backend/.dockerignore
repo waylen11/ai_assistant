@@ -1,0 +1,9 @@
+# 后端 .dockerignore
+target/
+*.log
+.idea/
+*.iml
+.git/
+.gitignore
+README.md
+Dockerfile
