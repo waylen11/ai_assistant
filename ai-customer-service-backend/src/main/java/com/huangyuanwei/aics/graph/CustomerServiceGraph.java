@@ -2,11 +2,15 @@ package com.huangyuanwei.aics.graph;
 
 import com.huangyuanwei.aics.dto.*;
 import com.huangyuanwei.aics.enums.GraphConstants;
+import com.huangyuanwei.aics.service.KnowledgeService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.document.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * SpringAIAlibabaGraph 客服流程编排图定义
@@ -15,6 +19,8 @@ import java.util.List;
 @Slf4j
 @Component
 public class CustomerServiceGraph {
+    @Autowired
+    private KnowledgeService knowledgeService;
 
     /**
      * 获取流程图 JSON 定义（供前端可视化渲染）
@@ -154,13 +160,41 @@ public class CustomerServiceGraph {
 
     private String retrieveKnowledge(String query) {
         // 实际调用 KnowledgeService 的 RAG 检索
-        log.debug("知识检索: {}", query);
-        return "";
+        /*log.debug("知识检索: {}", query);
+        return "";*/
+
+        log.info("知识检索: {}", query);               // debug → info，让你能在控制台看到
+        try {
+            // ① 调 KnowledgeService.retrieve，取 top3 最相似的文档块
+            List<Document> docs = knowledgeService.retrieve(query, 3);
+
+            // ② 没查到东西就返回空（ChatService 里 buildEnhancedSystemPrompt 会跳过拼接）
+            if (docs == null || docs.isEmpty()) {
+                log.info("知识检索未找到相关文档");
+                return "";
+            }
+
+            // ③ 把 List<Document> 里每个文档的 text 取出来，用 \n\n 拼成一整段字符串
+            String context = docs.stream()
+                    .map(Document::getText)
+                    .collect(Collectors.joining("\n\n"));
+
+            log.info("知识检索命中 {} 个文档片段", docs.size());
+            return context;                             // 返回给 ChatService，拼进系统提示
+        } catch (Exception e) {
+            // ④ 检索异常不能让整个对话崩了，打 log 返回空，模型裸答
+            log.error("知识检索异常: {}", e.getMessage(), e);
+            return "";
+        }
+
+
     }
 
     private String executeBusiness(String input, GraphContext context) {
         // 实际调用业务服务
         log.debug("业务执行: {}", input);
         return "";
+
+
     }
 }

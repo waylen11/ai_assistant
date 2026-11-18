@@ -82,7 +82,7 @@ public class KnowledgeService {
         kb.setUploadUserId(userId);
         kb = knowledgeBaseRepository.save(kb);
 
-        // 4. 进行 Chunk 分割预览（不做向量化，仅供展示）
+        // 4. 进行 Chunk 分割预览）
         List<Map<String, Object>> chunkPreviews = splitAndPreview(file);
         kb.setChunkCount(chunkPreviews.size());
         knowledgeBaseRepository.save(kb);
