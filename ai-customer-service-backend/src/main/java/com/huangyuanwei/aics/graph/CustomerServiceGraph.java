@@ -160,10 +160,7 @@ public class CustomerServiceGraph {
 
     private String retrieveKnowledge(String query) {
         // 实际调用 KnowledgeService 的 RAG 检索
-        /*log.debug("知识检索: {}", query);
-        return "";*/
-
-        log.info("知识检索: {}", query);               // debug → info，让你能在控制台看到
+        log.info("知识检索: {}", query);
         try {
             // ① 调 KnowledgeService.retrieve，取 top3 最相似的文档块
             List<Document> docs = knowledgeService.retrieve(query, 3);
@@ -186,15 +183,11 @@ public class CustomerServiceGraph {
             log.error("知识检索异常: {}", e.getMessage(), e);
             return "";
         }
-
-
     }
 
     private String executeBusiness(String input, GraphContext context) {
         // 实际调用业务服务
         log.debug("业务执行: {}", input);
         return "";
-
-
     }
 }
